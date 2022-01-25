@@ -13,10 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [App\Http\Controllers\ProductsController::class, 'index'])->name('home');
+
+/* Admin routes */
+Route::get('/admin', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('admin.settings');
+Route::post('/admin/settings/save', [App\Http\Controllers\Admin\AdminController::class, 'save'])->name('admin.settings.save');
+Route::get('/admin/import', [App\Http\Controllers\Admin\AdminController::class, 'import'])->name('admin.import');
