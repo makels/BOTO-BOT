@@ -19,13 +19,11 @@ use Illuminate\Support\Facades\Route;
  * Telegram API
  */
 Route::group(
-    ['prefix' => '/telegram/', 'middleware' => 'tg.check.req'],
+    ['prefix' => '/telegram', 'middleware' => 'tg.check.req'],
     function () {
         Route::get('/', [TelegramController::class, 'main']);
     }
 );
-
-
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
