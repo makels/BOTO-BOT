@@ -32,7 +32,7 @@ return [
     |             ]
     */
     'bots'                         => [
-        'mybot' => [
+        'boto_bot' => [
             'username'            => env('TG_USER'),
             'token'               => env('TG_KEY'),
             'certificate_path'    => env('TG_CERT'),
@@ -57,7 +57,7 @@ return [
     | your default bot for regular use.
     |
     */
-    'default'                      => 'mybot',
+    'default'                      => 'boto_bot',
 
     /*
     |--------------------------------------------------------------------------

@@ -22,7 +22,7 @@ class TelegramController extends Controller
         $username   = isset($result["message"]["from"]["username"]) ? $result["message"]["from"]["username"] : "";
 
         Log::info($text);
-        
+
         $telegram->sendMessage([
             'chat_id'       => $chat_id,
             'text'          => $text
