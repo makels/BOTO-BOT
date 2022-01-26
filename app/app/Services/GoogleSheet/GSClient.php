@@ -1,11 +1,9 @@
 <?php
-namespace App\GoogleSheet;
+namespace App\Services\GoogleSheet;
 
 use App\Models\Product;
 use App\Models\Setting;
-use Google\Service\Sheets;
 use Google_Service_Sheets;
-use function PHPUnit\Framework\isNull;
 
 /**
  * Class GSClient
@@ -75,10 +73,4 @@ class GSClient
 
     }
 
-    /**
-     * @param array $data
-     */
-    private function importProducts(array $data) {
-
-    }
 }
