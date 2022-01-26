@@ -91,15 +91,6 @@ class TelegramController extends Controller
     }
 
     /**
-     * @param Request $data
-     * @return bool
-     */
-    public function number(Request $data)
-    {
-        return TelegramService::getNumber($data);
-    }
-
-    /**
      * @return bool
      * @throws GuzzleException
      */

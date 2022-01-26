@@ -48,58 +48,6 @@ class Telegram
 
     /**
      * @param Request $request
-     * @return void
-     */
-    public function confirmPay(Request $request) {
-        $payload = $request->input('pre_checkout_query.invoice_payload');
-        if(!is_null($payload)) {
-            $payload = json_decode($payload, true);
-            $class = $payload["handler"];
-            if($class == "OnlinePayRecord") {
-                new OnlinePayRecord($request, $payload);
-            } elseif($class == "OnlinePayProduct") {
-                new OnlinePayProduct($request, $payload);
-            }
-        }
-    }
-
-    /**
-     * @param Request $request
-     * @throws YclientsException
-     */
-    public function setSuccessPayment(Request $request) {
-        /** @var TelegramUser $telegramUser */
-        $telegramUser = $request->input("client");
-        if(!is_null($telegramUser)) {
-            $record_id = $telegramUser->telegramSession->record;
-            if($record_id > 0) {
-                $query = Record::query()->where("id", $record_id);
-                $query->update(["status" => 1]);
-                $query = Payment::query()->where("record_id", $record_id);
-                $query->update(["status" => 1]);
-
-                $record = Record::query()->where("id", $record_id)->first();
-                if(!is_null($record)) {
-                    if (Yclients::isActive()) {
-                        // Todo: update record api call
-                        //$yclients = new Yclients();
-                        //$yclients->api->addRecords([$record]);
-                    }
-
-                    // Will upload this record to Beauty Pro CRM
-                    if (BeautyPro::isActive()) {
-                        $beauty = new BeautyPro();
-                        $beauty->api->updateRecords($record->id, "Онлайн оплата: Успешная оплата", "#49cc90");
-                    }
-                }
-
-            }
-        }
-
-    }
-
-    /**
-     * @param Request $request
      * @return bool
      */
     public function textCommand(Request $request): bool
@@ -148,32 +96,6 @@ class Telegram
         $class = $this->nsCallback.substr($data, 0, strpos($data, '_'));
         $a = new $class($request);
         return response()->json($a->result);
-    }
-
-    /**
-     * @param Request $request
-     * @return bool
-     */
-    public function getNumber(Request $request): bool
-    {
-        if ($request->has('client'))
-            return $this->redirectToStart($request);
-
-        $client = TelegramUser::create(
-            [
-                'chat_id'    => $request->input('message.chat.id'),
-                'first_name' => $request->input('message.chat.first_name'),
-                'last_name'  => $request->input('message.chat.last_name'),
-                'username'   => $request->input('message.chat.username'),
-                'phone'      => $request->input('message.contact.phone_number'),
-            ]
-        );
-
-        if ($client) {
-            $request->merge(['client' => $client]);
-            return $this->redirectToStart($request);
-        }
-        return false;
     }
 
     /**
