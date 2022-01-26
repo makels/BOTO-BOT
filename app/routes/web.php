@@ -24,3 +24,4 @@ Route::get('/admin/import', [App\Http\Controllers\Admin\AdminController::class, 
 
 /* Telegram routes */
 Route::post('/telegram', [App\Http\Controllers\TelegramController::class, 'main'])->name('telegram.main');
+Route::get('/telegram', [App\Http\Controllers\TelegramController::class, 'main'])->name('telegram.main');
