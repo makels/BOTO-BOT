@@ -22,5 +22,5 @@ Route::get('/admin', [App\Http\Controllers\Admin\AdminController::class, 'index'
 Route::post('/admin/settings/save', [App\Http\Controllers\Admin\AdminController::class, 'save'])->name('admin.settings.save');
 Route::get('/admin/import', [App\Http\Controllers\Admin\AdminController::class, 'import'])->name('admin.import');
 
-/*Telegram webhook url*/
-Route::post('/telegram/webhook', [App\Http\Controllers\TelegramController::class, 'webhook']);
+/* Telegram */
+Route::get('/admin/webhook', [App\Http\Controllers\TelegramController::class, 'setWebhook'])->name('admin.webhook');

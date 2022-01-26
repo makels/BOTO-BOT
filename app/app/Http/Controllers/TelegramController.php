@@ -1,31 +1,135 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\Setting;
+use App\Services\Telegram\Commands\Command;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Telegram\Bot\Api;
+use App\Facades\TelegramService;
+use Illuminate\Support\Facades\URL;
 
 class TelegramController extends Controller
 {
-
-    public function webhook(Request $request)
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function main(Request $request)
     {
-        Log::info("Start Bot...");
+        $id = null;
+        if ($request->has('message.chat.id')) {
+            $id = $request->input('message.chat.id');
+        }
+        else if ($request->has('callback_query.message.chat.id')) {
+            $id = $request->input('callback_query.message.chat.id');
+        } else {
+               Log::info($id . ': Unknown command');
+               abort(404);
+        }
 
-        $key = env('TELEGRAM_BOT_TOKEN');
-
-        $telegram = new Api($key);
-
-        $result = $telegram->getWebhookUpdate();
-
-        $text       = Setting::get(Setting::TELEGRAM_HEADER)->value;
-        $chat_id    = isset($result["message"]["chat"]["id"]) ? $result["message"]["chat"]["id"] : 0;
-        $username   = isset($result["message"]["from"]["username"]) ? $result["message"]["from"]["username"] : "";
-
-        $telegram->sendMessage([
-            'chat_id'       => $chat_id,
-            'text'          => $text
-        ]);
+        if ($request->has('callback_query')) {
+            return $this->button($request);
+        }
+        else if ($request->has('message.entities')) {
+            return $this->command($request);
+        }
+        else if ($request->has('message.contact.phone_number')) {
+            return $this->number($request);
+        }
+        else {
+            if ($request->has('message.text')) {
+                return $this->text($request);
+            }
+            return abort(404);
+        }
     }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function admin(Request $request)
+    {
+        if (!$request->has('gess_key') || ($request->input('gess_key') !== env('APP_KEY')))
+            return abort('404');
+        return TelegramService::rpcAdmin($request);
+    }
+
+    /**
+     * @param Request $data
+     * @return bool
+     */
+    public function text(Request $data)
+    {
+        if ($data->has('client'))
+            return TelegramService::textCommand($data);
+        return TelegramService::redirectToStart($data);
+    }
+
+    /**
+     * @param Request $data
+     * @return bool
+     */
+    public function command(Request $data)
+    {
+        if ($data->has('client'))
+            return TelegramService::doCommand($data);
+        return TelegramService::redirectToStart($data);
+    }
+
+    /**
+     * @param Request $data
+     * @return bool
+     */
+    public function button(Request $data)
+    {
+        if ($data->has('client'))
+            return TelegramService::doButton($data);
+        return TelegramService::redirectToStart($data);
+    }
+
+    /**
+     * @param Request $data
+     * @return bool
+     */
+    public function number(Request $data)
+    {
+        return TelegramService::getNumber($data);
+    }
+
+    /**
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function setWebhook (): bool
+    {
+        $base_url = URL::to('/');
+        try {
+            $client = new Client();
+            $response = $client->request(
+                'POST',
+                $base_url.'/api/telegram/admin',
+                [
+                    'json' => [
+                        'gess_key' => getenv('APP_KEY'),
+                        'call' => 'setWebhook',
+                        'params' => [
+                            'url' => $base_url.'/api/telegram'
+                        ]
+                    ]
+                ]
+            );
+
+            return $response->getBody()->getContents();
+
+        } catch (\Exception $e) {
+
+            return $e->getMessage();
+
+        }
+    }
+
+
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TelegramController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,19 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+/**
+ * Telegram API
+ */
+Route::group(
+    ['prefix' => '/telegram/', 'middleware' => 'tg.check.req'],
+    function () {
+        Route::post('/', [TelegramController::class, 'main']);
+        Route::post('/admin', [TelegramController::class, 'admin']);
+    }
+);
+
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
