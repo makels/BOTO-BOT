@@ -32,11 +32,11 @@ return [
     |             ]
     */
     'bots'                         => [
-        'boto_bot' => [
-            'username'            => env('TG_USER'),
-            'token'               => env('TG_KEY'),
-            'certificate_path'    => env('TG_CERT'),
-            'webhook_url'         => env('TG_WEBHOOK'),
+        env('TELEGRAM_NAME') => [
+            'username'            => env('TELEGRAM_USER'),
+            'token'               => env('TELEGRAM_BOT_TOKEN'),
+            'certificate_path'    => env('TELEGRAM_CERTIFICATE_PATH'),
+            'webhook_url'         => env('TELEGRAM_WEBHOOK_URL'),
             'commands'            => [
                 //Acme\Project\Commands\MyTelegramBot\BotCommand::class
             ],
@@ -57,7 +57,7 @@ return [
     | your default bot for regular use.
     |
     */
-    'default'                      => 'boto_bot',
+    'default'                      => env('TELEGRAM_NAME'),
 
     /*
     |--------------------------------------------------------------------------
