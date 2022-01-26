@@ -1,6 +1,6 @@
 .idea/
 .git
-gs_credentials.json
+/app/gs_credentials.json
 /app/vendor
 /app/node_modules
 /app/public/hot
