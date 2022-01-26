@@ -18,6 +18,7 @@ class TelegramController extends Controller
      */
     public function main(Request $request)
     {
+        Log::info('Begin Telegram command');
         $id = null;
         if ($request->has('message.chat.id')) {
             $id = $request->input('message.chat.id');
@@ -44,17 +45,6 @@ class TelegramController extends Controller
             }
             return abort(404);
         }
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function admin(Request $request)
-    {
-        if (!$request->has('gess_key') || ($request->input('gess_key') !== env('APP_KEY')))
-            return abort('404');
-        return TelegramService::rpcAdmin($request);
     }
 
     /**
@@ -89,38 +79,4 @@ class TelegramController extends Controller
             return TelegramService::doButton($data);
         return TelegramService::redirectToStart($data);
     }
-
-    /**
-     * @return bool
-     * @throws GuzzleException
-     */
-    public function setWebhook (): bool
-    {
-        $base_url = URL::to('/');
-        try {
-            $client = new Client();
-            $response = $client->request(
-                'POST',
-                $base_url.'/api/telegram/admin',
-                [
-                    'json' => [
-                        'gess_key' => getenv('APP_KEY'),
-                        'call' => 'setWebhook',
-                        'params' => [
-                            'url' => $base_url.'/api/telegram'
-                        ]
-                    ]
-                ]
-            );
-
-            return $response->getBody()->getContents();
-
-        } catch (\Exception $e) {
-
-            return $e->getMessage();
-
-        }
-    }
-
-
 }

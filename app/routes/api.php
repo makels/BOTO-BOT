@@ -21,8 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(
     ['prefix' => '/telegram/', 'middleware' => 'tg.check.req'],
     function () {
-        Route::post('/', [TelegramController::class, 'main']);
-        Route::post('/admin', [TelegramController::class, 'admin']);
+        Route::get('/', [TelegramController::class, 'main']);
     }
 );
 
