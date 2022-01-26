@@ -11,7 +11,9 @@ class TelegramController extends Controller
 
     public function webhook(Request $request)
     {
-        $key = env('TG_KEY');
+        Log::info("Start Bot...");
+
+        $key = env('TELEGRAM_BOT_TOKEN');
 
         $telegram = new Api($key);
 
@@ -20,8 +22,6 @@ class TelegramController extends Controller
         $text       = Setting::get(Setting::TELEGRAM_HEADER)->value;
         $chat_id    = isset($result["message"]["chat"]["id"]) ? $result["message"]["chat"]["id"] : 0;
         $username   = isset($result["message"]["from"]["username"]) ? $result["message"]["from"]["username"] : "";
-
-        Log::info($text);
 
         $telegram->sendMessage([
             'chat_id'       => $chat_id,
